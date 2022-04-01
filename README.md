@@ -6,7 +6,7 @@ The current Arduino robot setup uses an
 - 2 SG90 servo motors, a 
 - WS2812B LED strip, and a 
 - Canon EOS 450D DSLR camera with a 
-- Canon Canon EF-S 24mm f/2.8 STM lens. 
+- Canon EF-S 24mm f/2.8 STM lens. 
 
 A full list of the electronic and mechanical parts will be provided soon.
 
