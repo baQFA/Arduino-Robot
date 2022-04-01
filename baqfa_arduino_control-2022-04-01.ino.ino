@@ -16,6 +16,12 @@ Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 Servo servo1; // right side servo when looking from the direction of the camera
 Servo servo2; // left side servo when looking from the direction of the camera
 
+int pos1 = 0; // positioning of first servo
+int pos2 = 90; // use for positioning second servo
+
+// the interval between pictures during BaQFA, 5000ms are needed to take the picture 
+int interval = 1795000;
+
 //colors for cold white 4000K
 uint32_t coldwhite = strip.Color(128, 105, 82);
 
@@ -33,24 +39,16 @@ void setup() {
   servo1.write(0);
   servo2.write(90);
 
-  delay(30000); // wait 30 seconds so plate can be put in place
+  delay(20000); // wait 30 seconds so plate can be put in place
 
-  //close lid
-  servo1.write(90);
-  servo2.write(0);
-
-  delay(300);
-  
-  // detach servos to prevent them from moving when LED switches on/off
-  servo1.detach();
-  servo2.detach();
+  close_lid();
 
   pinMode(A4 , OUTPUT); // define the A4 analog pin for the camera shutter control
 
-  delay(1000);
-
-  testpicture();
-    
+  testpicture(3);
+  
+  delay(60000); // wait 1 minute until BaQFA starts so the box is closed for sure
+  
 }
 
 
@@ -58,88 +56,108 @@ void setup() {
 
 void loop() {
 
-// turn all LEDs on in cold white (4000 K) at half power
-  strip.fill(coldwhite);
-  strip.show();
-
-  servo1.attach(2);
-  servo2.attach(3);
-  delay(500);
-
-  // Open the lid
-  servo1.write(0);
-  servo2.write(90);
-  delay(2000);  //wait until the lid is open for sure and stops wobbling
-  
-  digitalWrite(A4 , HIGH); //trigger the OptoCoupler for camera shutter
-  delay(500);
-  digitalWrite(A4 , LOW); //stop triggering OptoCoupler
-  delay(5000);
-  
-  servo1.write(90);
-  servo2.write(0);
-
-  delay(1000);
-
-  servo1.detach();
-  servo2.detach();
-
-  
-  delay(500);
-
-// turn lights off 
-  strip.clear();
-  strip.show();
-
-   
-   delay(1790500);  //wait for a total cycle time of 30min
+    makepicture();
+    delay(interval);
   
 }
 
 
-void testpicture() {
 
-  int tstp = 0;
-  
-  while (tstp < 2) {
 
-  // turn all LEDs on in cold white (4000 K) at half power
-    strip.fill(coldwhite);
-    strip.show();
-
+void open_lid() {
+    
     servo1.attach(2);
     servo2.attach(3);
-    delay(500);
-
-    // Open the lid
-    servo1.write(0);
-    servo2.write(90);
-    delay(2000);  //wait until the lid is open for sure and stops wobbling
+    delay(50);
+    pos2 = 0;
   
-    digitalWrite(A4 , HIGH); //trigger the OptoCoupler for camera shutter
-    delay(500);
-    digitalWrite(A4 , LOW); //stop triggering OptoCoupler
-    delay(4000);
+    //open lid at speed of 1° every 15ms
+    for (pos1 = 90; pos1 >= 0; pos1--) {
+    servo1.write(pos1);
+      servo2.write(pos2);
+      pos2++;
+      delay(15);
+    }
   
-    servo1.write(90);
-    servo2.write(0);
-
-    delay(1000);
-
+    delay(50);
     servo1.detach();
     servo2.detach();
-
   
-    delay(500);
+}
 
+
+
+void close_lid() {
+  
+    servo1.attach(2);
+    servo2.attach(3);
+    delay(50);
+    pos2 = 90;
+  
+    //close lid at speed of 1° every 15ms
+    for (pos1 = 0; pos1 <= 90; pos1++) {
+    servo1.write(pos1);
+      servo2.write(pos2);
+      pos2--;
+      delay(15);
+    }
+    
+    delay(50);
+    servo1.detach();
+    servo2.detach();
+  
+}
+
+
+void lights_on() {
+ 
+    // turn all LEDs on in cold white (4000 K) at half power
+    strip.fill(coldwhite);
+    strip.show();
+    delay(100);
+  
+}
+
+
+void lights_off() {
+  
+  delay(50);
   // turn lights off 
     strip.clear();
     strip.show();
+  
+}
 
-   
-    delay(3000);
 
-    tstp++;
+
+void makepicture() {
+ 
+  lights_on();
+  
+    open_lid();
+    
+    digitalWrite(A4 , HIGH); //trigger the OptoCoupler for camera shutter
+    delay(500);
+    digitalWrite(A4 , LOW); //stop triggering OptoCoupler
+    delay(4500); //wait until exposure time for low-light picture is over
+  
+  close_lid();
+    
+    lights_off();
+}
+
+
+void testpicture(int tstp) {
+
+  while (tstp > 0) {
+      delay(3000);
+        makepicture();
+      tstp--;
 }
   
 }
+
+  
+  
+  
+  
