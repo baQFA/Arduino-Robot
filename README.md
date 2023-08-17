@@ -8,6 +8,5 @@ The current Arduino robot setup uses an
 - Canon EOS 450D DSLR camera with a 
 - Canon EF-S 24mm f/2.8 STM lens. 
 
-A full list of the electronic and mechanical parts will be provided soon.
 
 All printable parts are printed in PETG to withstand common disinfection solutions (e.g., ethanol).
