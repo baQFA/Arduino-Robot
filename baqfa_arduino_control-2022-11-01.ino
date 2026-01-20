@@ -9,7 +9,7 @@ ligthing.
 #include <Servo.h>
 
 #define LED_PIN     12
-#define LED_COUNT    52 //define the real number of LEDs according to the setup
+#define LED_COUNT   52   //define the real number of LEDs according to the setup
 
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
@@ -17,15 +17,15 @@ Servo servo_R; // right side servo when looking from the direction of the camera
 Servo servo_L; // left side servo when looking from the direction of the camera
 
 // servo positioning
-int open_position = 100;
-int close_position = 7;
-int pos_open_R = close_position - 5; // open positioning of right servo adjusting for servo offest due to mechanical parts
-int pos_open_L = open_position - 10; // open positioning left servo adjusting for servo offest due to mechanical parts
-int pos_close_R = open_position + 3; // close positioning of right servo adjusting for servo offest due to mechanical parts
-int pos_close_L = close_position - 2; // close positioning of left servo adjusting for servo offest due to mechanical parts
+int open_position = 150;
+int close_position = 50;
+int pos_open_R = close_position - 4; // open positioning of right servo adjusting for servo offest due to mechanical parts
+int pos_open_L = open_position - 4; // open positioning left servo adjusting for servo offest due to mechanical parts
+int pos_close_R = open_position - 12; // close positioning of right servo adjusting for servo offest due to mechanical parts
+int pos_close_L = close_position - 0; // close positioning of left servo adjusting for servo offest due to mechanical parts
 
-int pos_current_R = pos_open_R;
-int pos_current_L = pos_open_L;
+int pos_current_R = pos_close_R;
+int pos_current_L = pos_close_L;
 
 // the interval between pictures during BaQFA, 5000ms are needed to take the picture 
 int interval = 1795000;
@@ -46,12 +46,7 @@ void setup() {
   servo_L.attach(3);
   delay(100);
 
-  // open lid
-  servo_R.write(pos_current_R);
-  servo_L.write(pos_current_L);
-  delay(500);
-  servo_R.detach();
-  servo_L.detach();
+  open_lid();
   delay(1000);
 
   lights_on();
@@ -87,8 +82,7 @@ void open_lid() {
     
     servo_R.attach(2);
     servo_L.attach(3);
-    delay(50);
-    pos_current_L = pos_close_L -15; // some bug fucks up the corrections from above, thus it is re-applied here as quick-fix...
+    delay(100);
     
     //open lid at speed of 1° every 5ms
     for (pos_current_R = pos_close_R; pos_current_R >= pos_open_R; pos_current_R--) {
@@ -98,7 +92,7 @@ void open_lid() {
       delay(5);
     }
   
-    delay(50);
+    delay(100);
     servo_R.detach();
     servo_L.detach();
   
@@ -110,8 +104,8 @@ void close_lid() {
   
     servo_R.attach(2);
     servo_L.attach(3);
-    delay(50);
-    pos_current_R = pos_open_R;
+    delay(100);
+    //pos_current_R = pos_open_R;
   
     //close lid at speed of 1° every 7ms
     for (pos_current_L = pos_open_L; pos_current_L >= pos_close_L; pos_current_L--) {
@@ -121,7 +115,7 @@ void close_lid() {
       delay(7);
     }
     
-    delay(50);
+    delay(100);
     servo_R.detach();
     servo_L.detach();
   
